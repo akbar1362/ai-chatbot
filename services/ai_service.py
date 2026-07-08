@@ -2,7 +2,7 @@
 AI Service - handles communication with Groq API
 """
 import httpx
-from bot.config.settings import Config
+from ai_bot.config.settings import Config
 
 
 class AIService:

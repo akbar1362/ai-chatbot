@@ -10,8 +10,8 @@ from telegram.ext import (
     filters,
 )
 
-from bot.config.settings import Config
-from bot.handlers.handlers import (
+from ai_bot.config.settings import Config
+from ai_bot.handlers.handlers import (
     start_handler,
     main_menu_handler,
     about_handler,

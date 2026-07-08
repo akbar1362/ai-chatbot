@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python -m bot.main"
+    "startCommand": "python -m ai_bot.main"
   }
 }

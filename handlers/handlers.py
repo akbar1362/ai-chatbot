@@ -4,7 +4,7 @@ Main handler
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from bot.config.settings import Config
+from ai_bot.config.settings import Config
 
 
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -23,7 +23,7 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         f"🎯 فقط کافیه پیامت رو بفرستی!"
     )
 
-    from bot.keyboards.keyboards import get_main_menu_keyboard
+    from ai_bot.keyboards.keyboards import get_main_menu_keyboard
     await update.message.reply_text(
         text=text,
         reply_markup=get_main_menu_keyboard(),
@@ -36,7 +36,7 @@ async def main_menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     query = update.callback_query
     await query.answer()
 
-    from bot.keyboards.keyboards import get_main_menu_keyboard
+    from ai_bot.keyboards.keyboards import get_main_menu_keyboard
     await query.edit_message_text(
         text="💬 هر سوالی داری بپرس:",
         reply_markup=get_main_menu_keyboard(),
@@ -48,7 +48,7 @@ async def about_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     query = update.callback_query
     await query.answer()
 
-    from bot.keyboards.keyboards import get_back_keyboard
+    from ai_bot.keyboards.keyboards import get_back_keyboard
     await query.edit_message_text(
         text=(
             f"ℹ️ <b>درباره {Config.BOT_NAME}</b>\n\n"
@@ -69,7 +69,7 @@ async def clear_history_handler(update: Update, context: ContextTypes.DEFAULT_TY
 
     context.user_data.pop("chat_history", None)
 
-    from bot.keyboards.keyboards import get_main_menu_keyboard
+    from ai_bot.keyboards.keyboards import get_main_menu_keyboard
     await query.edit_message_text(
         text="🗑️ تاریخچه مکالمه پاک شد.\n\n💬 هر سوالی داری بپرس:",
         reply_markup=get_main_menu_keyboard(),
@@ -94,7 +94,7 @@ async def chat_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     history = context.user_data["chat_history"]
 
     # Get AI response
-    from bot.services.ai_service import AIService
+    from ai_bot.services.ai_service import AIService
     ai = AIService()
     response = await ai.chat_with_history(user_id, user_message, history)
 
