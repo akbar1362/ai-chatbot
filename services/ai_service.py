@@ -2,20 +2,23 @@
 AI Service - handles communication with Groq API
 """
 import httpx
-from ai_bot.config.settings import Config
 
 
 class AIService:
     def __init__(self):
-        self.api_key = Config.GROQ_API_KEY
-        self.api_url = Config.GROQ_API_URL
-        self.model = Config.GROQ_MODEL
-        self.system_prompt = Config.SYSTEM_PROMPT
+        import os
+        self.api_key = os.getenv("GROQ_API_KEY", "")
+        self.api_url = "https://api.groq.com/openai/v1/chat/completions"
+        self.model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        self.system_prompt = os.getenv(
+            "SYSTEM_PROMPT",
+            "You are a helpful AI assistant. Answer in Persian.",
+        )
 
     async def chat(self, messages: list[dict], temperature: float = 0.7) -> str:
         """Send chat request to Groq API"""
         if not self.api_key:
-            return "❌ کلید API تنظیم نشده است. لطفاً GROQ_API_KEY را در .env وارد کنید."
+            return "API key not configured."
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -33,38 +36,28 @@ class AIService:
 
         try:
             async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(
-                    self.api_url,
-                    headers=headers,
-                    json=payload,
-                )
+                response = await client.post(self.api_url, headers=headers, json=payload)
 
                 if response.status_code == 200:
                     data = response.json()
                     return data["choices"][0]["message"]["content"]
                 elif response.status_code == 401:
-                    return "❌ کلید API نامعتبر است."
+                    return "Invalid API key."
                 elif response.status_code == 429:
-                    return "⚠️ درخواست‌ها بیش از حد مجاز هستند. لطفاً کمی صبر کنید."
+                    return "Rate limit exceeded. Please wait."
                 else:
-                    return f"❌ خطای API: {response.status_code}"
+                    return f"API error: {response.status_code}"
         except httpx.TimeoutException:
-            return "⚠️ پاسخ AI بیش از حد طول کشید. لطفاً دوباره تلاش کنید."
+            return "Request timed out. Please try again."
         except Exception as e:
-            return f"❌ خطا: {str(e)}"
-
-    async def simple_chat(self, user_message: str) -> str:
-        """Simple single message chat"""
-        messages = [{"role": "user", "content": user_message}]
-        return await self.chat(messages)
+            return f"Error: {str(e)}"
 
     async def chat_with_history(self, user_id: int, user_message: str, history: list[dict]) -> str:
         """Chat with conversation history"""
         history.append({"role": "user", "content": user_message})
 
-        # Keep history within limit
-        if len(history) > Config.MAX_HISTORY:
-            history = history[-Config.MAX_HISTORY:]
+        if len(history) > 20:
+            history = history[-20:]
 
         response = await self.chat(history)
         history.append({"role": "assistant", "content": response})

@@ -10,14 +10,7 @@ from telegram.ext import (
     filters,
 )
 
-from ai_bot.config.settings import Config
-from ai_bot.handlers.handlers import (
-    start_handler,
-    main_menu_handler,
-    about_handler,
-    clear_history_handler,
-    chat_handler,
-)
+import os
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -28,16 +21,27 @@ logger = logging.getLogger(__name__)
 
 def main() -> None:
     """Run the bot"""
-    if not Config.BOT_TOKEN:
+    BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+
+    if not BOT_TOKEN:
         logger.error("BOT_TOKEN not set!")
         return
 
-    if not Config.GROQ_API_KEY:
+    if not GROQ_API_KEY:
         logger.warning("GROQ_API_KEY not set! AI features will not work.")
 
     logger.info("Starting AI Chatbot...")
 
-    application = Application.builder().token(Config.BOT_TOKEN).build()
+    from handlers.handlers import (
+        start_handler,
+        main_menu_handler,
+        about_handler,
+        clear_history_handler,
+        chat_handler,
+    )
+
+    application = Application.builder().token(BOT_TOKEN).build()
 
     # Commands
     application.add_handler(CommandHandler("start", start_handler))
@@ -55,7 +59,6 @@ def main() -> None:
     # Error handler
     async def error_handler(update, context):
         logger.error(f"Error: {context.error}")
-
     application.add_error_handler(error_handler)
 
     logger.info("Bot is running!")

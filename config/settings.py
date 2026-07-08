@@ -21,9 +21,9 @@ class Config:
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
     # Bot Settings
-    BOT_NAME: str = os.getenv("BOT_NAME", "🤖 هوش مصنوعی")
+    BOT_NAME: str = os.getenv("BOT_NAME", "AI Chatbot")
     MAX_HISTORY: int = int(os.getenv("MAX_HISTORY", "20"))
     SYSTEM_PROMPT: str = os.getenv(
         "SYSTEM_PROMPT",
-        "تو یک دستیار هوش مصنوعی فارسی‌زبان هستی. به سوالات کاربر به فارسی پاسخ بده. پاسخ‌هایت دقیق، مفید و کامل باشد.",
+        "You are a helpful AI assistant. Answer in Persian.",
     )
