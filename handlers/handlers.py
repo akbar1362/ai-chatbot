@@ -7,7 +7,7 @@ from telegram.ext import ContextTypes
 
 
 BOT_NAME = os.getenv("BOT_NAME", "AI Chatbot")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+AI_MODEL = os.getenv("AI_MODEL", "xiaomi/mimo-v2.5")
 
 
 def _get_main_menu_keyboard():
@@ -55,7 +55,7 @@ async def about_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     """Handle about"""
     query = update.callback_query
     await query.answer()
-    text = f"About {BOT_NAME}\n\nModel: {GROQ_MODEL}\nServer: Groq (Fastest)"
+    text = f"About {BOT_NAME}\n\nModel: {AI_MODEL}\nProvider: OpenRouter"
     await query.edit_message_text(text=text, reply_markup=_get_back_keyboard())
 
 
@@ -69,10 +69,14 @@ async def clear_history_handler(update: Update, context: ContextTypes.DEFAULT_TY
 
 async def chat_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle chat messages"""
+    import logging
+    logger = logging.getLogger(__name__)
+
     if not update.message or not update.message.text:
         return
 
     user_message = update.message.text
+    logger.info(f"User {update.effective_user.id}: {user_message[:50]}")
     await update.message.chat.send_action("typing")
 
     if "chat_history" not in context.user_data:
@@ -80,8 +84,13 @@ async def chat_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     history = context.user_data["chat_history"]
 
-    from services.ai_service import AIService
-    ai = AIService()
-    response = await ai.chat_with_history(update.effective_user.id, user_message, history)
+    try:
+        from services.ai_service import AIService
+        ai = AIService()
+        response = await ai.chat_with_history(update.effective_user.id, user_message, history)
+        logger.info(f"Response: {response[:50]}")
+    except Exception as e:
+        logger.error(f"Error in chat_handler: {e}")
+        response = f"Error: {str(e)}"
 
     await update.message.reply_text(text=response)

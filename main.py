@@ -22,14 +22,14 @@ logger = logging.getLogger(__name__)
 def main() -> None:
     """Run the bot"""
     BOT_TOKEN = os.getenv("BOT_TOKEN", "")
-    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+    OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 
     if not BOT_TOKEN:
         logger.error("BOT_TOKEN not set!")
         return
 
-    if not GROQ_API_KEY:
-        logger.warning("GROQ_API_KEY not set! AI features will not work.")
+    if not OPENROUTER_API_KEY:
+        logger.warning("OPENROUTER_API_KEY not set! AI features will not work.")
 
     logger.info("Starting AI Chatbot...")
 

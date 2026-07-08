@@ -1,5 +1,4 @@
 # AI Chatbot Dependencies
 
 python-telegram-bot==21.6
-httpx==0.28.1
 python-dotenv==1.0.1
